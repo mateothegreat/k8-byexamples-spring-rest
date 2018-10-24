@@ -1,11 +1,11 @@
-apiVersion: extensions/v1beta1
+apiVersion: apps/v1
 kind:       Deployment
 metadata:
   name: k8-byexamples-spring-rest
-  labels:
-    app: k8-byexamples-spring-rest
 spec:
-  replicas: 1
+  selector:
+    matchLabels:
+      app: k8-byexamples-spring-rest
   template:
     metadata:
       labels:
@@ -16,4 +16,18 @@ spec:
           image: gcr.io/matthewdavis-byexamples/k8-byexamples-spring-rest:1d4c1401c9485ef61322d9f2bb33157951eb351f
           ports:
             - containerPort: 8080
-              name:          http
+              name: http
+          readinessProbe:
+            httpGet:
+              path: /test/is_ready
+              scheme: http
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /test/is_alive
+              scheme: http
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 15
